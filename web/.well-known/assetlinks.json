@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ralfiz.cafe_app",
+      "sha256_cert_fingerprints": [
+        "03:16:C9:2D:E8:9A:5D:CF:8F:B7:6F:DA:3A:6D:88:5A:C3:03:B9:D8:73:FC:53:C4:39:95:2A:92:B5:F9:5C:B0"
+      ]
+    }
+  }
+]

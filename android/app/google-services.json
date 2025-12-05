@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "815985929308",
+    "project_id": "cafeapp-352be",
+    "storage_bucket": "cafeapp-352be.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815985929308:android:cc39afc60095a8dd070a99",
+        "android_client_info": {
+          "package_name": "com.ralfiz.cafe_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-w3_EVTsxdCYeBEITu2dOqu1De8Q2m_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
