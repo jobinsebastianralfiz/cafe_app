@@ -43,8 +43,22 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
 
     if (rawValue == null) return;
 
-    // Check if QR code matches our format: cafeapp://table/{tableId}
-    if (!rawValue.startsWith('cafeapp://table/')) {
+    // Extract table ID from QR code - support multiple formats
+    String? tableId;
+
+    // Format 1: Web URL - https://cafeapp-352be.web.app/table-bill?tableId={tableId}
+    if (rawValue.contains('table-bill?tableId=')) {
+      final uri = Uri.tryParse(rawValue);
+      if (uri != null) {
+        tableId = uri.queryParameters['tableId'];
+      }
+    }
+    // Format 2: Deep link - cafeapp://table/{tableId}
+    else if (rawValue.startsWith('cafeapp://table/')) {
+      tableId = rawValue.replaceFirst('cafeapp://table/', '');
+    }
+
+    if (tableId == null || tableId.isEmpty) {
       _showErrorSnackBar('Invalid QR code. Please scan a table QR code.');
       return;
     }
@@ -53,9 +67,6 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
       _isProcessing = true;
       _hasScanned = true;
     });
-
-    // Extract table ID from QR code
-    final tableId = rawValue.replaceFirst('cafeapp://table/', '');
 
     // Validate table exists and is available
     final viewModel = ref.read(tableViewModelProvider.notifier);

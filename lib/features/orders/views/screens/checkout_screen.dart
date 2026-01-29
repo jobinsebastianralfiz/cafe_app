@@ -417,10 +417,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        user.when(
-                          data: (userData) {
-                            if (userData != null && userData.addresses.isNotEmpty) {
-                              final address = userData.addresses.first;
+                        Builder(
+                          builder: (context) {
+                            final selectedAddress = ref.watch(selectedDeliveryAddressProvider);
+                            if (selectedAddress != null) {
                               return Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
@@ -440,13 +440,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            address.label,
+                                            selectedAddress.label,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                           Text(
-                                            address.fullAddress,
+                                            selectedAddress.fullAddress,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodySmall
@@ -461,17 +461,30 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                 ),
                               );
                             } else {
-                              return ElevatedButton.icon(
-                                onPressed: () {
-                                  context.push('/profile/addresses/add');
+                              return user.when(
+                                data: (userData) {
+                                  if (userData != null && userData.addresses.isNotEmpty) {
+                                    // Auto-select first address if none selected
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      ref.read(selectedDeliveryAddressProvider.notifier).state =
+                                          userData.addresses.first;
+                                    });
+                                    return const Center(child: CircularProgressIndicator());
+                                  } else {
+                                    return ElevatedButton.icon(
+                                      onPressed: () {
+                                        context.push('/profile/addresses/add');
+                                      },
+                                      icon: const Icon(Icons.add),
+                                      label: const Text('Add Delivery Address'),
+                                    );
+                                  }
                                 },
-                                icon: const Icon(Icons.add),
-                                label: const Text('Add Delivery Address'),
+                                loading: () => const Center(child: CircularProgressIndicator()),
+                                error: (_, __) => const Text('Error loading address'),
                               );
                             }
                           },
-                          loading: () => const CircularProgressIndicator(),
-                          error: (_, __) => const Text('Error loading address'),
                         ),
                       ],
                     ),

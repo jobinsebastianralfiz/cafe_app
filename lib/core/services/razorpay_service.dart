@@ -36,7 +36,11 @@ class RazorpayService {
       'amount': amountInPaise,
       'name': 'Ralfiz Cafe',
       'description': 'Order Payment - $orderId',
-      'order_id': orderId, // Generate order_id using Orders API in production
+      // Note: 'order_id' requires a Razorpay-generated order ID from Orders API (backend)
+      // For testing without backend, we omit it and Razorpay auto-generates one
+      'notes': {
+        'order_id': orderId, // Store our order ID in notes for reference
+      },
       'prefill': {
         'contact': userPhone,
         'email': userEmail,

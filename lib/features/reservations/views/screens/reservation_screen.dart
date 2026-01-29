@@ -29,6 +29,17 @@ class _ReservationScreenState extends ConsumerState<ReservationScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Auto-select today's date when screen opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (ref.read(selectedDateProvider) == null) {
+        ref.read(selectedDateProvider.notifier).state = DateTime.now();
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _specialRequestsController.dispose();
     super.dispose();

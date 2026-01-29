@@ -75,6 +75,8 @@ class SeedService {
       'role': UserRole.customer,
       'loyaltyTier': 'bronze',
       'coinBalance': 50,
+
+
       'addresses': [
         {
           'id': 'addr_1',
