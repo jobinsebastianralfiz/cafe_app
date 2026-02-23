@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/theme/app_colors.dart';
 
-/// Quick Action Button - Navigation button for common actions
+/// Quick Action Button - Warm cafe style
 class QuickActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -23,34 +25,30 @@ class QuickActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
+          color: AppColors.surfaceVariant,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: color.withValues(alpha: 0.3),
-            width: 1,
-          ),
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color,
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: Colors.white,
+                color: color,
                 size: 28,
               ),
             ),
             const SizedBox(height: 12),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: color,
+                color: AppColors.textPrimary,
               ),
               textAlign: TextAlign.center,
             ),

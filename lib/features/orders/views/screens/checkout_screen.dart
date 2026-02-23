@@ -281,7 +281,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.teal.shade400, Colors.teal.shade600],
+                        colors: [AppColors.accent, AppColors.accentDark],
                       ),
                     ),
                     child: Row(
@@ -342,12 +342,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.qr_code, size: 16, color: Colors.teal.shade600),
+                              Icon(Icons.qr_code, size: 16, color: AppColors.accent),
                               const SizedBox(width: 4),
                               Text(
                                 'QR',
                                 style: TextStyle(
-                                  color: Colors.teal.shade600,
+                                  color: AppColors.accent,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 12,
                                 ),

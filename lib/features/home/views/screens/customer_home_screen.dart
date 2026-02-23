@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/viewmodels/auth_viewmodel.dart';
 import '../../../orders/viewmodels/order_viewmodel.dart';
 import '../../../venue/viewmodels/venue_viewmodel.dart';
 import '../../../menu/viewmodels/menu_viewmodel.dart';
+import '../../../menu/views/widgets/menu_item_grid_card.dart';
 import '../widgets/venue_status_banner.dart';
 import '../widgets/active_order_card.dart';
-import '../widgets/quick_action_button.dart';
 
 /// Bottom nav index provider
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
 
-/// Customer Home Screen - Main dashboard for customers
+/// Customer Home Screen - Cafe-style dashboard
 class CustomerHomeScreen extends ConsumerWidget {
   const CustomerHomeScreen({super.key});
 
@@ -21,16 +22,18 @@ class CustomerHomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
     final cartItemCount = ref.watch(cartItemCountProvider);
-    final currentIndex = ref.watch(bottomNavIndexProvider);
     final activeOrders = ref.watch(userActiveOrdersProvider);
+    final categoriesAsync = ref.watch(categoriesProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    final filteredItems = ref.watch(filteredMenuItemsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: _buildDrawer(context, ref, user),
       body: SafeArea(
         child: RefreshIndicator(
+          color: AppColors.accent,
           onRefresh: () async {
-            // Refresh all data
             ref.invalidate(userActiveOrdersProvider);
             ref.invalidate(venueSettingsProvider);
             ref.invalidate(currentUserProvider);
@@ -40,198 +43,240 @@ class CustomerHomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with user info
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.primary,
-                        AppColors.primary.withValues(alpha: 0.8),
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                // Welcome Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                  child: Row(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Menu icon
-                          Builder(
-                            builder: (context) => IconButton(
-                              onPressed: () => Scaffold.of(context).openDrawer(),
-                              icon: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(
-                                  Icons.menu,
-                                  color: Colors.white,
-                                  size: 24,
+                      // User Avatar
+                      user.when(
+                        data: (userData) => GestureDetector(
+                          onTap: () => context.push('/profile'),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryLight,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.primary,
+                                width: 2,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                (userData?.name ?? 'G')[0].toUpperCase(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.accent,
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          // User greeting
-                          user.when(
-                            data: (userData) => Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Hello ${userData?.name ?? "Guest"}!',
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Welcome to Ralfiz Cafe',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            loading: () => const CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                            error: (_, __) => const Text('Error loading user'),
-                          ),
-
-                          // Cart icon
-                          Stack(
+                        ),
+                        loading: () => const SizedBox(width: 48, height: 48),
+                        error: (_, __) => const SizedBox(width: 48, height: 48),
+                      ),
+                      const SizedBox(width: 12),
+                      // Welcome text
+                      Expanded(
+                        child: user.when(
+                          data: (userData) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              IconButton(
-                                onPressed: () => context.push('/cart'),
-                                icon: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.shopping_cart_outlined,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
+                              Text(
+                                'Welcome,',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
-                              if (cartItemCount > 0)
-                                Positioned(
-                                  right: 8,
-                                  top: 8,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.accent,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    constraints: const BoxConstraints(
-                                      minWidth: 20,
-                                      minHeight: 20,
-                                    ),
-                                    child: Text(
-                                      cartItemCount.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
+                              Text(
+                                userData?.name ?? 'Guest',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
                                 ),
+                              ),
                             ],
                           ),
-                        ],
+                          loading: () => const SizedBox(),
+                          error: (_, __) => const Text('Welcome'),
+                        ),
                       ),
-                      const SizedBox(height: 16),
-
-                      // Coins balance
-                      user.when(
-                        data: (userData) {
-                          if (userData != null) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.stars,
-                                    color: AppColors.accent,
-                                    size: 24,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Your Coins',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${userData.coinBalance} coins',
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  TextButton(
-                                    onPressed: () {
-                                      context.push('/wallet');
-                                    },
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: AppColors.primary,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                    ),
-                                    child: const Text('View'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (_, __) => const SizedBox.shrink(),
+                      // Notification bell
+                      IconButton(
+                        onPressed: () => context.push('/notifications'),
+                        icon: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceVariant,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.notifications_outlined,
+                            color: AppColors.textPrimary,
+                            size: 22,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
 
+                const SizedBox(height: 20),
+
+                // Search Bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => context.push('/menu'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceVariant,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.search,
+                                  color: AppColors.textHint,
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'Search...',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: AppColors.textHint,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      GestureDetector(
+                        onTap: () => context.push('/menu'),
+                        child: Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceVariant,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.tune,
+                            color: AppColors.textPrimary,
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
                 // Venue Status Banner
                 const VenueStatusBanner(),
 
-                const SizedBox(height: 16),
+                // Promo Banner
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.promoBannerGradient,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Today Only',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '50% OFF',
+                                style: GoogleFonts.playfairDisplay(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                'Super Discount',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.white.withValues(alpha: 0.9),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 36,
+                                child: ElevatedButton(
+                                  onPressed: () => context.push('/menu'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: AppColors.textPrimary,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Book Now',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Coffee cup illustration placeholder
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.coffee,
+                            size: 50,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
 
                 // Active Orders Section
                 activeOrders.when(
@@ -247,21 +292,25 @@ class CustomerHomeScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   'Active Orders',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                      ),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () => context.push('/orders'),
-                                  child: const Text('View All'),
+                                  child: Text(
+                                    'View All',
+                                    style: GoogleFonts.poppins(
+                                      color: AppColors.accent,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 8),
                           SizedBox(
                             height: 180,
                             child: ListView.builder(
@@ -273,7 +322,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                               },
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
                         ],
                       );
                     }
@@ -283,188 +332,139 @@ class CustomerHomeScreen extends ConsumerWidget {
                   error: (_, __) => const SizedBox.shrink(),
                 ),
 
-                // Quick Actions
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Quick Actions',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
+                // Category Chips
+                categoriesAsync.when(
+                  data: (categories) {
+                    if (categories.isEmpty) return const SizedBox();
+                    return Container(
+                      height: 48,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: categories.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            final isSelected = selectedCategory == null ||
+                                selectedCategory.isEmpty;
+                            return _CategoryPill(
+                              label: 'All',
+                              isSelected: isSelected,
+                              onTap: () {
+                                ref.read(selectedCategoryProvider.notifier).state =
+                                    null;
+                              },
+                            );
+                          }
+                          final category = categories[index - 1];
+                          return _CategoryPill(
+                            label: category.name,
+                            isSelected: selectedCategory == category.id,
+                            onTap: () {
+                              ref.read(selectedCategoryProvider.notifier).state =
+                                  category.id;
+                            },
+                          );
+                        },
                       ),
-                      const SizedBox(height: 16),
-                      // Scan Table QR - Prominent action
-                      InkWell(
-                        onTap: () => context.push('/scan-table'),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Colors.teal, Colors.cyan],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.teal.withValues(alpha: 0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(
-                                  Icons.qr_code_scanner,
-                                  color: Colors.white,
-                                  size: 32,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              const Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Scan Table QR',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      'Dine-in? Scan QR code on your table',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const Icon(
-                                Icons.arrow_forward_ios,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.restaurant_menu,
-                              label: 'Browse Menu',
-                              color: AppColors.primary,
-                              onTap: () => context.push('/menu'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.receipt_long,
-                              label: 'My Orders',
-                              color: Colors.orange,
-                              onTap: () => context.push('/orders'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.table_restaurant,
-                              label: 'Book Table',
-                              color: Colors.purple,
-                              onTap: () => context.push('/reservations'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: QuickActionButton(
-                              icon: Icons.account_balance_wallet,
-                              label: 'My Wallet',
-                              color: AppColors.accent,
-                              onTap: () => context.push('/wallet'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    );
+                  },
+                  loading: () => const SizedBox(height: 48),
+                  error: (_, __) => const SizedBox(),
                 ),
 
-                const SizedBox(height: 24),
-
-                // Special Features
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Special Features',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                      ),
-                      const SizedBox(height: 16),
-                      _FeatureCard(
-                        icon: Icons.movie,
-                        title: 'Movie Night',
-                        subtitle: 'Vote for next movie & win rewards',
-                        gradient: const LinearGradient(
-                          colors: [Colors.purple, Colors.deepPurple],
+                // Menu Items Grid
+                filteredItems.when(
+                  data: (items) {
+                    if (items.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(40),
+                        child: Center(
+                          child: Text('No items available'),
                         ),
-                        onTap: () => context.push('/movies'),
-                      ),
-                      const SizedBox(height: 12),
-                      _FeatureCard(
-                        icon: Icons.local_fire_department,
-                        title: 'Daily Specials',
-                        subtitle: 'Check today\'s special dishes',
-                        gradient: const LinearGradient(
-                          colors: [Colors.orange, Colors.deepOrange],
+                      );
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.72,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
                         ),
-                        onTap: () => context.push('/specials'),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          return MenuItemGridCard(
+                            item: items[index],
+                            onTap: () {
+                              context.push('/menu/item/${items[index].id}');
+                            },
+                          );
+                        },
                       ),
-                      const SizedBox(height: 12),
-                      _FeatureCard(
-                        icon: Icons.sports_esports,
-                        title: 'Saturday Games',
-                        subtitle: 'Play games & climb the leaderboard',
-                        gradient: const LinearGradient(
-                          colors: [Colors.green, Colors.teal],
-                        ),
-                        onTap: () => context.push('/games'),
+                    );
+                  },
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(40),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.accent,
                       ),
-                    ],
+                    ),
                   ),
+                  error: (_, __) => const SizedBox(),
                 ),
 
-                const SizedBox(height: 100), // Space for bottom nav
+                const SizedBox(height: 100),
               ],
             ),
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(context, ref, currentIndex, cartItemCount),
+      bottomNavigationBar: _buildBottomNav(context, ref, cartItemCount),
+    );
+  }
+}
+
+/// Category pill widget matching the design
+class _CategoryPill extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CategoryPill({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.textPrimary : AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isSelected ? Colors.white : AppColors.textPrimary,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -472,13 +472,14 @@ class CustomerHomeScreen extends ConsumerWidget {
 /// Build drawer
 Widget _buildDrawer(BuildContext context, WidgetRef ref, AsyncValue user) {
   return Drawer(
+    backgroundColor: AppColors.surface,
     child: ListView(
       padding: EdgeInsets.zero,
       children: [
         DrawerHeader(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryDark],
+              colors: [AppColors.accent, AppColors.accentDark],
             ),
           ),
           child: user.when(
@@ -488,13 +489,13 @@ Widget _buildDrawer(BuildContext context, WidgetRef ref, AsyncValue user) {
               children: [
                 CircleAvatar(
                   radius: 35,
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.primaryLight,
                   child: Text(
                     (userData?.name ?? 'G')[0].toUpperCase(),
-                    style: const TextStyle(
+                    style: GoogleFonts.playfairDisplay(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: AppColors.accent,
                     ),
                   ),
                 ),
@@ -523,7 +524,7 @@ Widget _buildDrawer(BuildContext context, WidgetRef ref, AsyncValue user) {
           ),
         ),
         ListTile(
-          leading: const Icon(Icons.home),
+          leading: const Icon(Icons.home_outlined),
           title: const Text('Home'),
           onTap: () {
             Navigator.pop(context);
@@ -539,7 +540,7 @@ Widget _buildDrawer(BuildContext context, WidgetRef ref, AsyncValue user) {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.receipt_long),
+          leading: const Icon(Icons.receipt_long_outlined),
           title: const Text('My Orders'),
           onTap: () {
             Navigator.pop(context);
@@ -547,16 +548,16 @@ Widget _buildDrawer(BuildContext context, WidgetRef ref, AsyncValue user) {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.account_balance_wallet),
+          leading: const Icon(Icons.account_balance_wallet_outlined),
           title: const Text('Wallet'),
           onTap: () {
             Navigator.pop(context);
             context.push('/wallet');
           },
         ),
-        const Divider(),
+        const Divider(color: AppColors.divider),
         ListTile(
-          leading: const Icon(Icons.person),
+          leading: const Icon(Icons.person_outline),
           title: const Text('Profile'),
           onTap: () {
             Navigator.pop(context);
@@ -564,19 +565,50 @@ Widget _buildDrawer(BuildContext context, WidgetRef ref, AsyncValue user) {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.settings),
-          title: const Text('Settings'),
+          leading: const Icon(Icons.qr_code_scanner),
+          title: const Text('Scan Table QR'),
           onTap: () {
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Settings coming soon!')),
-            );
+            context.push('/scan-table');
           },
         ),
-        const Divider(),
         ListTile(
-          leading: const Icon(Icons.logout, color: Colors.red),
-          title: const Text('Logout', style: TextStyle(color: Colors.red)),
+          leading: const Icon(Icons.table_restaurant_outlined),
+          title: const Text('Book Table'),
+          onTap: () {
+            Navigator.pop(context);
+            context.push('/reservations');
+          },
+        ),
+        const Divider(color: AppColors.divider),
+        ListTile(
+          leading: const Icon(Icons.movie_outlined),
+          title: const Text('Movie Night'),
+          onTap: () {
+            Navigator.pop(context);
+            context.push('/movies');
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.sports_esports_outlined),
+          title: const Text('Saturday Games'),
+          onTap: () {
+            Navigator.pop(context);
+            context.push('/games');
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.local_fire_department_outlined),
+          title: const Text('Daily Specials'),
+          onTap: () {
+            Navigator.pop(context);
+            context.push('/specials');
+          },
+        ),
+        const Divider(color: AppColors.divider),
+        ListTile(
+          leading: Icon(Icons.logout, color: AppColors.error),
+          title: Text('Logout', style: TextStyle(color: AppColors.error)),
           onTap: () {
             Navigator.pop(context);
             ref.read(authViewModelProvider.notifier).signOut();
@@ -588,22 +620,22 @@ Widget _buildDrawer(BuildContext context, WidgetRef ref, AsyncValue user) {
   );
 }
 
-/// Build bottom navigation
-Widget _buildBottomNav(BuildContext context, WidgetRef ref, int currentIndex, int cartCount) {
+/// Build bottom navigation - cafe style
+Widget _buildBottomNav(BuildContext context, WidgetRef ref, int cartCount) {
   return Container(
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppColors.surface,
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: 0.1),
-          blurRadius: 10,
+          color: AppColors.shadow,
+          blurRadius: 20,
           offset: const Offset(0, -5),
         ),
       ],
     ),
     child: SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -614,29 +646,23 @@ Widget _buildBottomNav(BuildContext context, WidgetRef ref, int currentIndex, in
               onTap: () => context.go('/'),
             ),
             _buildNavItem(
-              icon: Icons.restaurant_menu,
-              label: 'Menu',
-              isSelected: false,
-              onTap: () => context.push('/menu'),
-            ),
-            _buildNavItem(
-              icon: Icons.shopping_cart,
+              icon: Icons.shopping_cart_outlined,
               label: 'Cart',
               isSelected: false,
               badge: cartCount > 0 ? cartCount.toString() : null,
               onTap: () => context.push('/cart'),
             ),
             _buildNavItem(
-              icon: Icons.receipt_long,
-              label: 'Orders',
+              icon: Icons.favorite_outline,
+              label: 'Favorites',
               isSelected: false,
-              onTap: () => context.push('/orders'),
+              onTap: () => context.push('/menu'),
             ),
             _buildNavItem(
-              icon: Icons.account_balance_wallet,
-              label: 'Wallet',
+              icon: Icons.person_outline,
+              label: 'Profile',
               isSelected: false,
-              onTap: () => context.push('/wallet'),
+              onTap: () => context.push('/profile'),
             ),
           ],
         ),
@@ -654,14 +680,14 @@ Widget _buildNavItem({
 }) {
   return InkWell(
     onTap: onTap,
-    borderRadius: BorderRadius.circular(12),
+    borderRadius: BorderRadius.circular(16),
     child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : null,
-        borderRadius: BorderRadius.circular(12),
+        color: isSelected ? AppColors.textPrimary : Colors.transparent,
+        borderRadius: BorderRadius.circular(25),
       ),
-      child: Column(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
@@ -669,8 +695,8 @@ Widget _buildNavItem({
             children: [
               Icon(
                 icon,
-                color: isSelected ? AppColors.primary : Colors.grey,
-                size: 24,
+                color: isSelected ? Colors.white : AppColors.textHint,
+                size: 22,
               ),
               if (badge != null)
                 Positioned(
@@ -679,7 +705,7 @@ Widget _buildNavItem({
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: AppColors.accent,
+                      color: AppColors.error,
                       shape: BoxShape.circle,
                     ),
                     constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
@@ -687,7 +713,7 @@ Widget _buildNavItem({
                       badge,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 10,
+                        fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -696,100 +722,19 @@ Widget _buildNavItem({
                 ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? AppColors.primary : Colors.grey,
+          if (isSelected) ...[
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     ),
   );
-}
-
-class _FeatureCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Gradient gradient;
-  final VoidCallback onTap;
-
-  const _FeatureCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.gradient,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 32,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-              size: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
 
-/// App Color Palette - Fresh & Vibrant Theme
+/// App Color Palette - Warm Coffee Cafe Theme
 class AppColors {
   AppColors._();
 
-  // Primary Colors - Teal/Turquoise
-  static const Color primary = Color(0xFF00BFA5); // Vibrant Teal
-  static const Color primaryLight = Color(0xFF5DF2D6); // Light Teal
-  static const Color primaryDark = Color(0xFF008E76); // Dark Teal
-  static const Color primaryGradientStart = Color(0xFF00D4B5);
-  static const Color primaryGradientEnd = Color(0xFF00BFA5);
+  // Primary Colors - Warm Tan/Brown (buttons, chips, accents)
+  static const Color primary = Color(0xFFC8A97E); // Warm Tan
+  static const Color primaryLight = Color(0xFFDEC5A0); // Light Tan
+  static const Color primaryDark = Color(0xFFA0845A); // Dark Tan
+  static const Color primaryGradientStart = Color(0xFFD4B48A);
+  static const Color primaryGradientEnd = Color(0xFFC8A97E);
 
-  // Accent Colors - Orange
-  static const Color accent = Color(0xFFFF6B35); // Vibrant Orange
-  static const Color accentLight = Color(0xFFFF9D6E); // Light Orange
-  static const Color accentDark = Color(0xFFE64A19); // Dark Orange
-  static const Color accentGradientStart = Color(0xFFFF7E47);
-  static const Color accentGradientEnd = Color(0xFFFF6B35);
+  // Accent Colors - Dark Coffee Brown (text emphasis, dark buttons)
+  static const Color accent = Color(0xFF5D4037); // Coffee Brown
+  static const Color accentLight = Color(0xFF8D6E63); // Light Brown
+  static const Color accentDark = Color(0xFF3E2723); // Dark Espresso
+  static const Color accentGradientStart = Color(0xFF6D4C41);
+  static const Color accentGradientEnd = Color(0xFF5D4037);
 
   // Neutral Colors
-  static const Color background = Color(0xFFFAFAFA); // Off-white
+  static const Color background = Color(0xFFFFF8F0); // Warm Cream
   static const Color surface = Color(0xFFFFFFFF); // Pure white
-  static const Color surfaceVariant = Color(0xFFF5F5F5); // Light gray
+  static const Color surfaceVariant = Color(0xFFF5EFE6); // Light Beige
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF212121); // Almost black
-  static const Color textSecondary = Color(0xFF757575); // Medium gray
-  static const Color textHint = Color(0xFFBDBDBD); // Light gray
-  static const Color textOnPrimary = Color(0xFFFFFFFF); // White
-  static const Color textOnAccent = Color(0xFFFFFFFF); // White
+  static const Color textPrimary = Color(0xFF2C1810); // Dark Espresso
+  static const Color textSecondary = Color(0xFF8B7355); // Medium Brown
+  static const Color textHint = Color(0xFFC4B39A); // Muted Tan
+  static const Color textOnPrimary = Color(0xFF2C1810); // Dark on light buttons
+  static const Color textOnAccent = Color(0xFFFFFFFF); // White on dark buttons
 
   // Semantic Colors
   static const Color success = Color(0xFF4CAF50); // Green
@@ -37,15 +37,15 @@ class AppColors {
   static const Color info = Color(0xFF2196F3); // Blue
 
   // Special UI Colors
-  static const Color divider = Color(0xFFE0E0E0);
-  static const Color shadow = Color(0x1F000000);
-  static const Color overlay = Color(0x66000000);
-  static const Color shimmerBase = Color(0xFFE0E0E0);
-  static const Color shimmerHighlight = Color(0xFFF5F5F5);
+  static const Color divider = Color(0xFFE8DFD3);
+  static const Color shadow = Color(0x1A5D4037);
+  static const Color overlay = Color(0x663E2723);
+  static const Color shimmerBase = Color(0xFFE8DFD3);
+  static const Color shimmerHighlight = Color(0xFFF5EFE6);
 
   // Glassmorphism
-  static const Color glassBackground = Color(0xCCFFFFFF); // 80% white
-  static const Color glassBackgroundDark = Color(0x99000000); // 60% black
+  static const Color glassBackground = Color(0xCCFFF8F0); // 80% cream
+  static const Color glassBackgroundDark = Color(0x993E2723); // 60% dark brown
 
   // Gradient Presets
   static const LinearGradient primaryGradient = LinearGradient(
@@ -61,9 +61,9 @@ class AppColors {
   );
 
   static const LinearGradient heroGradient = LinearGradient(
-    colors: [primary, accent],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    colors: [Color(0xFFFFF8F0), Color(0xFFF5EFE6)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
   );
 
   static const LinearGradient shimmerGradient = LinearGradient(
@@ -73,6 +73,13 @@ class AppColors {
     end: Alignment(1.0, 0.3),
   );
 
+  // Promo Banner Gradient
+  static const LinearGradient promoBannerGradient = LinearGradient(
+    colors: [Color(0xFF4A6741), Color(0xFF3D5A35)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   // Food Category Colors
   static const Color vegColor = Color(0xFF4CAF50);
   static const Color nonVegColor = Color(0xFFE53935);
@@ -80,7 +87,7 @@ class AppColors {
 
   // Rating Colors
   static const Color ratingGold = Color(0xFFFFD700);
-  static const Color ratingEmpty = Color(0xFFE0E0E0);
+  static const Color ratingEmpty = Color(0xFFE8DFD3);
 
   // Status Colors for Orders
   static const Color statusPlaced = Color(0xFF2196F3); // Blue

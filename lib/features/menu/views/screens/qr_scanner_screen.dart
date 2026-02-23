@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../admin/viewmodels/table_viewmodel.dart';
 
 /// QR Scanner Screen for scanning table QR codes
@@ -128,7 +129,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Scan Table QR'),
-        backgroundColor: Colors.teal,
+        backgroundColor: AppColors.accent,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -237,7 +238,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
         width: 250,
         height: 250,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.teal, width: 3),
+          border: Border.all(color: AppColors.accent, width: 3),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(

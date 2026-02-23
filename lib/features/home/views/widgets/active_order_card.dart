@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../orders/models/order_model.dart';
 
-/// Active Order Card - Compact view of active order
+/// Active Order Card - Compact view of active order with cafe styling
 class ActiveOrderCard extends StatelessWidget {
   final OrderModel order;
 
@@ -18,15 +19,27 @@ class ActiveOrderCard extends StatelessWidget {
       width: 280,
       margin: const EdgeInsets.only(right: 16),
       child: Card(
-        elevation: 2,
+        elevation: 0,
+        color: AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
         child: InkWell(
           onTap: () => context.push('/order-tracking/${order.id}'),
           borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              color: AppColors.surface,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -35,16 +48,17 @@ class ActiveOrderCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Order number and status
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
                           child: Text(
                             order.orderNumber,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -52,8 +66,6 @@ class ActiveOrderCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-
-                    // Items count and amount
                     Row(
                       children: [
                         Icon(
@@ -64,21 +76,21 @@ class ActiveOrderCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           '${order.totalItems} ${order.totalItems == 1 ? 'item' : 'items'}',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
-
-                    // Amount
                     Text(
                       order.pricing.formattedFinalAmount,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
-                          ),
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.accent,
+                      ),
                     ),
                   ],
                 ),
@@ -90,12 +102,19 @@ class ActiveOrderCard extends StatelessWidget {
                     onPressed: () => context.push('/order-tracking/${order.id}'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      foregroundColor: AppColors.textPrimary,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Track Order',
-                      style: TextStyle(fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 ),
@@ -142,8 +161,8 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontSize: 11,
+        style: GoogleFonts.poppins(
+          fontSize: 10,
           fontWeight: FontWeight.w600,
           color: color,
         ),

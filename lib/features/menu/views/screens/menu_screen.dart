@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../models/category_model.dart';
 import '../../viewmodels/menu_viewmodel.dart';
@@ -8,7 +9,7 @@ import '../../../admin/viewmodels/table_viewmodel.dart';
 import '../widgets/category_chip.dart';
 import '../widgets/menu_item_card.dart';
 
-/// Menu Screen - Beautiful Browse Experience
+/// Menu Screen - Cafe Browse Experience
 class MenuScreen extends ConsumerWidget {
   const MenuScreen({super.key});
 
@@ -30,10 +31,10 @@ class MenuScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: AppColors.shadow,
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -54,9 +55,17 @@ class MenuScreen extends ConsumerWidget {
                             context.go('/');
                           }
                         },
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: AppColors.textPrimary,
+                        icon: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceVariant,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: AppColors.textPrimary,
+                            size: 18,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -66,16 +75,18 @@ class MenuScreen extends ConsumerWidget {
                           children: [
                             Text(
                               'Our Menu',
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.textPrimary,
-                                  ),
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                             Text(
-                              'Discover delicious food',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
+                              'Discover delicious coffee',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ],
                         ),
@@ -86,14 +97,15 @@ class MenuScreen extends ConsumerWidget {
                           IconButton(
                             onPressed: () => context.push('/cart'),
                             icon: Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
+                                color: AppColors.surfaceVariant,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: const Icon(
                                 Icons.shopping_cart_outlined,
-                                color: AppColors.primary,
+                                color: AppColors.textPrimary,
+                                size: 22,
                               ),
                             ),
                           ),
@@ -104,12 +116,12 @@ class MenuScreen extends ConsumerWidget {
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: const BoxDecoration(
-                                  color: AppColors.accent,
+                                  color: AppColors.error,
                                   shape: BoxShape.circle,
                                 ),
                                 constraints: const BoxConstraints(
-                                  minWidth: 20,
-                                  minHeight: 20,
+                                  minWidth: 18,
+                                  minHeight: 18,
                                 ),
                                 child: Text(
                                   cartItemCount.toString(),
@@ -134,11 +146,18 @@ class MenuScreen extends ConsumerWidget {
                       ref.read(searchQueryProvider.notifier).state = value;
                     },
                     decoration: InputDecoration(
-                      hintText: 'Search for dishes...',
-                      prefixIcon: const Icon(Icons.search),
+                      hintText: 'Search for coffee...',
+                      hintStyle: GoogleFonts.poppins(
+                        color: AppColors.textHint,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: AppColors.textHint,
+                      ),
                       suffixIcon: searchQuery.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear),
+                              icon: const Icon(Icons.clear, color: AppColors.textSecondary),
                               onPressed: () {
                                 ref.read(searchQueryProvider.notifier).state = '';
                               },
@@ -147,7 +166,7 @@ class MenuScreen extends ConsumerWidget {
                       filled: true,
                       fillColor: AppColors.surfaceVariant,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
@@ -164,13 +183,13 @@ class MenuScreen extends ConsumerWidget {
             if (selectedTable != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                color: Colors.teal.withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: 0.15),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Colors.teal,
+                        color: AppColors.accent,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
@@ -186,27 +205,27 @@ class MenuScreen extends ConsumerWidget {
                         children: [
                           Text(
                             'Ordering for ${selectedTable.name}',
-                            style: const TextStyle(
+                            style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w600,
-                              color: Colors.teal,
+                              color: AppColors.accent,
+                              fontSize: 13,
                             ),
                           ),
                           Text(
-                            '${selectedTable.capacity} seats • ${selectedTable.location.displayName}',
-                            style: TextStyle(
+                            '${selectedTable.capacity} seats \u2022 ${selectedTable.location.displayName}',
+                            style: GoogleFonts.poppins(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 20, color: Colors.grey),
+                      icon: Icon(Icons.close, size: 20, color: AppColors.textSecondary),
                       onPressed: () {
                         ref.read(selectedTableProvider.notifier).state = null;
                       },
-                      tooltip: 'Clear table selection',
                     ),
                   ],
                 ),
@@ -218,15 +237,14 @@ class MenuScreen extends ConsumerWidget {
                 if (categories.isEmpty) return const SizedBox();
 
                 return Container(
-                  height: 60,
+                  height: 56,
                   margin: const EdgeInsets.symmetric(vertical: 12),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: categories.length + 1, // +1 for "All" category
+                    itemCount: categories.length + 1,
                     itemBuilder: (context, index) {
                       if (index == 0) {
-                        // "All" category
                         return CategoryChip(
                           category: CategoryModel(
                             id: '',
@@ -254,8 +272,10 @@ class MenuScreen extends ConsumerWidget {
                 );
               },
               loading: () => const SizedBox(
-                height: 60,
-                child: Center(child: CircularProgressIndicator()),
+                height: 56,
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.accent),
+                ),
               ),
               error: (error, stack) => const SizedBox(),
             ),
@@ -272,7 +292,7 @@ class MenuScreen extends ConsumerWidget {
                           Icon(
                             searchQuery.isNotEmpty
                                 ? Icons.search_off
-                                : Icons.restaurant_menu,
+                                : Icons.coffee,
                             size: 80,
                             color: AppColors.textHint,
                           ),
@@ -281,17 +301,20 @@ class MenuScreen extends ConsumerWidget {
                             searchQuery.isNotEmpty
                                 ? 'No items found'
                                 : 'No menu items available',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                           if (searchQuery.isNotEmpty) ...[
                             const SizedBox(height: 8),
                             Text(
                               'Try searching with different keywords',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textHint,
-                                  ),
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: AppColors.textHint,
+                              ),
                             ),
                           ],
                         ],
@@ -314,7 +337,7 @@ class MenuScreen extends ConsumerWidget {
                   );
                 },
                 loading: () => const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: AppColors.accent),
                 ),
                 error: (error, stack) => Center(
                   child: Column(
@@ -328,14 +351,18 @@ class MenuScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Text(
                         'Something went wrong',
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         error.toString(),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],

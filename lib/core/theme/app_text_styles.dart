@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// App Text Styles - Modern Typography
+/// App Text Styles - Warm Cafe Typography
 class AppTextStyles {
   AppTextStyles._();
 
   // Base Font Family
   static String get fontFamily => GoogleFonts.poppins().fontFamily!;
-  static String get headingFont => GoogleFonts.montserrat().fontFamily!;
-  static String get displayFont => GoogleFonts.nunito().fontFamily!;
+  static String get headingFont => GoogleFonts.playfairDisplay().fontFamily!;
+  static String get displayFont => GoogleFonts.playfairDisplay().fontFamily!;
 
   // Heading Styles
-  static TextStyle h1 = GoogleFonts.montserrat(
+  static TextStyle h1 = GoogleFonts.playfairDisplay(
     fontSize: 32,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
@@ -20,7 +20,7 @@ class AppTextStyles {
     height: 1.2,
   );
 
-  static TextStyle h2 = GoogleFonts.montserrat(
+  static TextStyle h2 = GoogleFonts.playfairDisplay(
     fontSize: 28,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
@@ -28,7 +28,7 @@ class AppTextStyles {
     height: 1.2,
   );
 
-  static TextStyle h3 = GoogleFonts.montserrat(
+  static TextStyle h3 = GoogleFonts.playfairDisplay(
     fontSize: 24,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
@@ -36,7 +36,7 @@ class AppTextStyles {
     height: 1.3,
   );
 
-  static TextStyle h4 = GoogleFonts.montserrat(
+  static TextStyle h4 = GoogleFonts.poppins(
     fontSize: 20,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
@@ -44,7 +44,7 @@ class AppTextStyles {
     height: 1.3,
   );
 
-  static TextStyle h5 = GoogleFonts.montserrat(
+  static TextStyle h5 = GoogleFonts.poppins(
     fontSize: 18,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
@@ -52,7 +52,7 @@ class AppTextStyles {
     height: 1.4,
   );
 
-  static TextStyle h6 = GoogleFonts.montserrat(
+  static TextStyle h6 = GoogleFonts.poppins(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
@@ -111,7 +111,7 @@ class AppTextStyles {
   );
 
   // Special Styles
-  static TextStyle displayLarge = GoogleFonts.nunito(
+  static TextStyle displayLarge = GoogleFonts.playfairDisplay(
     fontSize: 48,
     fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
@@ -119,7 +119,7 @@ class AppTextStyles {
     height: 1.1,
   );
 
-  static TextStyle displayMedium = GoogleFonts.nunito(
+  static TextStyle displayMedium = GoogleFonts.playfairDisplay(
     fontSize: 36,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
@@ -127,7 +127,7 @@ class AppTextStyles {
     height: 1.1,
   );
 
-  static TextStyle displaySmall = GoogleFonts.nunito(
+  static TextStyle displaySmall = GoogleFonts.playfairDisplay(
     fontSize: 28,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
@@ -151,18 +151,18 @@ class AppTextStyles {
   );
 
   // Price Styles
-  static TextStyle price = GoogleFonts.montserrat(
+  static TextStyle price = GoogleFonts.poppins(
     fontSize: 20,
     fontWeight: FontWeight.w700,
-    color: AppColors.primary,
+    color: AppColors.textPrimary,
     letterSpacing: 0,
     height: 1.2,
   );
 
-  static TextStyle priceSmall = GoogleFonts.montserrat(
+  static TextStyle priceSmall = GoogleFonts.poppins(
     fontSize: 16,
     fontWeight: FontWeight.w600,
-    color: AppColors.primary,
+    color: AppColors.textPrimary,
     letterSpacing: 0,
     height: 1.2,
   );
@@ -186,11 +186,11 @@ class AppTextStyles {
     textBaseline: TextBaseline.alphabetic,
   );
 
-  // Order Number Style (fun, bold)
-  static TextStyle orderNumber = GoogleFonts.rubik(
+  // Order Number Style
+  static TextStyle orderNumber = GoogleFonts.poppins(
     fontSize: 24,
     fontWeight: FontWeight.w800,
-    color: AppColors.primary,
+    color: AppColors.accent,
     letterSpacing: 1,
     height: 1.2,
   );
@@ -199,7 +199,7 @@ class AppTextStyles {
   static TextStyle chip = GoogleFonts.poppins(
     fontSize: 12,
     fontWeight: FontWeight.w600,
-    color: AppColors.textOnPrimary,
+    color: AppColors.textPrimary,
     letterSpacing: 0.3,
     height: 1.2,
   );

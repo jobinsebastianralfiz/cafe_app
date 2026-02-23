@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../models/menu_item_model.dart';
 import '../../viewmodels/menu_viewmodel.dart';
 
-/// Beautiful Menu Item Card Widget
+/// Menu Item Card Widget - Warm Cafe Style
 class MenuItemCard extends ConsumerWidget {
   final MenuItemModel item;
   final VoidCallback? onTap;
@@ -27,11 +28,11 @@ class MenuItemCard extends ConsumerWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: AppColors.shadow,
               blurRadius: 15,
               offset: const Offset(0, 4),
             ),
@@ -57,13 +58,15 @@ class MenuItemCard extends ConsumerWidget {
                       height: 180,
                       color: AppColors.surfaceVariant,
                       child: const Center(
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator(
+                          color: AppColors.accent,
+                        ),
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
                       height: 180,
                       color: AppColors.surfaceVariant,
-                      child: const Icon(Icons.restaurant, size: 50),
+                      child: Icon(Icons.coffee, size: 50, color: AppColors.textHint),
                     ),
                   ),
                 ),
@@ -92,45 +95,51 @@ class MenuItemCard extends ConsumerWidget {
                   ),
                 ),
 
+                // Favorite / Heart icon
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      isInCart ? Icons.favorite : Icons.favorite_outline,
+                      color: isInCart ? Colors.red : AppColors.textSecondary,
+                      size: 18,
+                    ),
+                  ),
+                ),
+
                 // Popular Badge
                 if (item.isPopular)
                   Positioned(
-                    top: 12,
-                    right: 12,
+                    bottom: 12,
+                    left: 12,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
+                        horizontal: 10,
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.accent, AppColors.accentDark],
-                        ),
+                        color: AppColors.accent,
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.accent.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                          ),
-                        ],
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.whatshot,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Popular',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                          ),
-                        ],
+                      child: Text(
+                        'Popular',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -138,11 +147,11 @@ class MenuItemCard extends ConsumerWidget {
                 // New Badge
                 if (item.isNew && !item.isPopular)
                   Positioned(
-                    top: 12,
-                    right: 12,
+                    bottom: 12,
+                    left: 12,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
+                        horizontal: 10,
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
@@ -151,10 +160,11 @@ class MenuItemCard extends ConsumerWidget {
                       ),
                       child: Text(
                         'NEW',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textPrimary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
@@ -173,9 +183,11 @@ class MenuItemCard extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           item.name,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -192,9 +204,11 @@ class MenuItemCard extends ConsumerWidget {
                             const SizedBox(width: 4),
                             Text(
                               item.averageRating.toStringAsFixed(1),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                           ],
                         ),
@@ -205,9 +219,10 @@ class MenuItemCard extends ConsumerWidget {
                   // Description
                   Text(
                     item.description,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -219,10 +234,11 @@ class MenuItemCard extends ConsumerWidget {
                       // Price
                       Text(
                         item.formattedPrice,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w800,
-                            ),
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       const SizedBox(width: 8),
 
@@ -239,7 +255,7 @@ class MenuItemCard extends ConsumerWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.access_time,
                               size: 14,
                               color: AppColors.textSecondary,
@@ -247,10 +263,11 @@ class MenuItemCard extends ConsumerWidget {
                             const SizedBox(width: 4),
                             Text(
                               item.prepTimeString,
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: GoogleFonts.poppins(
+                                fontSize: 11,
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ],
                         ),
@@ -264,19 +281,21 @@ class MenuItemCard extends ConsumerWidget {
                           onPressed: () => cartActions.addToCart(item),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.textPrimary,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(25),
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
-                              vertical: 12,
+                              vertical: 10,
                             ),
+                            elevation: 0,
                           ),
-                          child: const Text(
+                          child: Text(
                             'ADD',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontWeight: FontWeight.w700,
-                              fontSize: 14,
+                              fontSize: 13,
                             ),
                           ),
                         )
@@ -284,8 +303,8 @@ class MenuItemCard extends ConsumerWidget {
                         // Quantity Controls
                         Container(
                           decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(25),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -303,7 +322,7 @@ class MenuItemCard extends ConsumerWidget {
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: Text(
                                   quantity.toString(),
-                                  style: const TextStyle(
+                                  style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
