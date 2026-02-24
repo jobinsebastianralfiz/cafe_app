@@ -25,7 +25,6 @@ class CustomerHomeScreen extends ConsumerWidget {
     final activeOrders = ref.watch(userActiveOrdersProvider);
     final categoriesAsync = ref.watch(categoriesProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
-    final filteredItems = ref.watch(filteredMenuItemsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -276,6 +275,73 @@ class CustomerHomeScreen extends ConsumerWidget {
                   ),
                 ),
 
+                const SizedBox(height: 24),
+
+                // Quick Actions
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    'Quick Actions',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 100,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    children: [
+                      _QuickActionItem(
+                        icon: Icons.qr_code_scanner,
+                        label: 'Scan QR',
+                        color: const Color(0xFF5D4037),
+                        onTap: () => context.push('/scan-table'),
+                      ),
+                      _QuickActionItem(
+                        icon: Icons.table_restaurant_rounded,
+                        label: 'Book Table',
+                        color: const Color(0xFF4A6741),
+                        onTap: () => context.push('/reservations'),
+                      ),
+                      _QuickActionItem(
+                        icon: Icons.account_balance_wallet_rounded,
+                        label: 'Wallet',
+                        color: const Color(0xFFC8A97E),
+                        onTap: () => context.push('/wallet'),
+                      ),
+                      _QuickActionItem(
+                        icon: Icons.receipt_long_rounded,
+                        label: 'My Orders',
+                        color: const Color(0xFF2196F3),
+                        onTap: () => context.push('/orders'),
+                      ),
+                      _QuickActionItem(
+                        icon: Icons.local_fire_department_rounded,
+                        label: 'Specials',
+                        color: const Color(0xFFFF9800),
+                        onTap: () => context.push('/specials'),
+                      ),
+                      _QuickActionItem(
+                        icon: Icons.movie_rounded,
+                        label: 'Movie Night',
+                        color: const Color(0xFF9C27B0),
+                        onTap: () => context.push('/movies'),
+                      ),
+                      _QuickActionItem(
+                        icon: Icons.sports_esports_rounded,
+                        label: 'Games',
+                        color: const Color(0xFFE53935),
+                        onTap: () => context.push('/games'),
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 20),
 
                 // Active Orders Section
@@ -332,80 +398,70 @@ class CustomerHomeScreen extends ConsumerWidget {
                   error: (_, __) => const SizedBox.shrink(),
                 ),
 
-                // Category Chips
+                // Category Chips & Products by Category
                 categoriesAsync.when(
                   data: (categories) {
                     if (categories.isEmpty) return const SizedBox();
-                    return Container(
-                      height: 48,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        itemCount: categories.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == 0) {
-                            final isSelected = selectedCategory == null ||
-                                selectedCategory.isEmpty;
-                            return _CategoryPill(
-                              label: 'All',
-                              isSelected: isSelected,
-                              onTap: () {
-                                ref.read(selectedCategoryProvider.notifier).state =
-                                    null;
-                              },
-                            );
-                          }
-                          final category = categories[index - 1];
-                          return _CategoryPill(
-                            label: category.name,
-                            isSelected: selectedCategory == category.id,
-                            onTap: () {
-                              ref.read(selectedCategoryProvider.notifier).state =
-                                  category.id;
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  },
-                  loading: () => const SizedBox(height: 48),
-                  error: (_, __) => const SizedBox(),
-                ),
 
-                // Menu Items Grid
-                filteredItems.when(
-                  data: (items) {
-                    if (items.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(40),
-                        child: Center(
-                          child: Text('No items available'),
-                        ),
-                      );
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.72,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                        ),
-                        itemCount: items.length,
-                        itemBuilder: (context, index) {
-                          return MenuItemGridCard(
-                            item: items[index],
-                            onTap: () {
-                              context.push('/menu/item/${items[index].id}');
+                    // Deduplicate categories by name (keep first occurrence)
+                    final seen = <String>{};
+                    final uniqueCategories = categories.where((c) {
+                      final key = c.name.toLowerCase().trim();
+                      if (seen.contains(key)) return false;
+                      seen.add(key);
+                      return true;
+                    }).toList();
+
+                    final displayCategories =
+                        (selectedCategory != null && selectedCategory.isNotEmpty)
+                            ? uniqueCategories
+                                .where((c) => c.id == selectedCategory)
+                                .toList()
+                            : uniqueCategories;
+
+                    return Column(
+                      children: [
+                        // Category pills
+                        Container(
+                          height: 48,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            itemCount: uniqueCategories.length + 1,
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                final isSelected = selectedCategory == null ||
+                                    selectedCategory.isEmpty;
+                                return _CategoryPill(
+                                  label: 'All',
+                                  isSelected: isSelected,
+                                  onTap: () {
+                                    ref.read(selectedCategoryProvider.notifier).state =
+                                        null;
+                                  },
+                                );
+                              }
+                              final category = uniqueCategories[index - 1];
+                              return _CategoryPill(
+                                label: category.name,
+                                isSelected: selectedCategory == category.id,
+                                onTap: () {
+                                  ref.read(selectedCategoryProvider.notifier).state =
+                                      category.id;
+                                },
+                              );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+
+                        // Product sections per category
+                        ...displayCategories
+                            .map((category) => _CategoryProductsSection(
+                                  categoryId: category.id,
+                                  categoryName: category.name,
+                                )),
+                      ],
                     );
                   },
                   loading: () => const Padding(
@@ -465,6 +521,147 @@ class _CategoryPill extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Quick action item widget
+class _QuickActionItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickActionItem({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 76,
+        margin: const EdgeInsets.only(right: 14),
+        child: Column(
+          children: [
+            Container(
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Category section showing items in a horizontal scroll
+class _CategoryProductsSection extends ConsumerWidget {
+  final String categoryId;
+  final String categoryName;
+
+  const _CategoryProductsSection({
+    required this.categoryId,
+    required this.categoryName,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final itemsAsync = ref.watch(menuItemsByCategoryProvider(categoryId));
+
+    return itemsAsync.when(
+      data: (items) {
+        if (items.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Section header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      categoryName,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        ref.read(selectedCategoryProvider.notifier).state =
+                            categoryId;
+                        context.push('/menu');
+                      },
+                      child: Text(
+                        'See All',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.accent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Horizontal product list
+              SizedBox(
+                height: 220,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      width: 160,
+                      margin: const EdgeInsets.only(right: 14),
+                      child: MenuItemGridCard(
+                        item: items[index],
+                        onTap: () {
+                          context.push('/menu/item/${items[index].id}');
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }
