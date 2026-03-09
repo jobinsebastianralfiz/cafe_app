@@ -378,7 +378,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 8),
                           SizedBox(
-                            height: 180,
+                            height: 192,
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               padding: const EdgeInsets.symmetric(horizontal: 20),
